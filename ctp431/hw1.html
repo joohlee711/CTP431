@@ -109,7 +109,7 @@
   
 
     var E79 = new XMLHttpRequest();
-    E79.open("Get","E79.wav",true); // My File
+    E79.open("Get","E79.mp3",true); // My File
     E79.responseType = "arraybuffer";
     E79.onload = function(){
         context.decodeAudioData(E79.response, function(buffer){buffers[0] = buffer;});
@@ -117,7 +117,7 @@
     E79.send();
   
     var G = new XMLHttpRequest();
-    G.open("Get","G.wav",true);
+    G.open("Get","G.mp3",true);
     G.responseType = "arraybuffer";
     G.onload = function(){
         context.decodeAudioData(G.response, function(buffer){buffers[1] = buffer;});
@@ -125,7 +125,7 @@
     G.send();
   
     var A = new XMLHttpRequest();
-    A.open("Get","A.wav",true);
+    A.open("Get","A.mp3",true);
     A.responseType = "arraybuffer";
     A.onload = function(){
         context.decodeAudioData(A.response, function(buffer){buffers[2] = buffer;});
