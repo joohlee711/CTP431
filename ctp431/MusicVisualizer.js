@@ -2,11 +2,12 @@
 
 var context;
 var source = null;
-var myAudioBuffer = null;
-
 var sourceNode = null;
 var mediaSourceNode = null;
 var analyser = null;
+
+var chosenFileBuffer = null;
+var demoFileBuffer = null;
 
 var vis_view;
 var vis_value;
@@ -18,7 +19,7 @@ var SOUND_METER_WIDTH = 40;
 var SOUND_METER_HEIGHT = HEIGHT;
 var SOUND_METER_MIN_LEVEL = -96.0;  // dB
 
-var micOn = false;
+var micPlayOn = false;
 var demoPlayOn = false;
 var filePlayOn = false;
 
@@ -32,28 +33,21 @@ for (var i=0; i <10;i++ ) {
 
 
 
-var demo_buffer;
+
+
+
+
 
 window.onload=function(){
 	var MicAudio = document.getElementById("micInput");
 	MicAudio.addEventListener("click", playMic, false);
 
-	var DemoAudio = document.getElementById("demoAudioInput");
+	var DemoAudio = document.getElementById("demoFileInput");
 	DemoAudio.addEventListener("click", playDemo, false);
 
-	var FileAudio = document.getElementById("fileChooseInput");
+	var FileAudio = document.getElementById("chosenFileInput");
 	FileAudio.addEventListener("change", fileChanged, false);
 	window.AudioContext = window.AudioContext || window.webkitAudioContext;
-
-	var visMod1 = document.getElementById("visMode1");
-	visMod1.addEventListener("click", function(){
-			setAnimationFunction(1)	
-	}, false); 
-
-	var visMod2 = document.getElementById("visMode2");
-	visMod2.addEventListener("click", function(){
-			setAnimationFunction(2)	
-	}, false); 
 
 	vis_view = document.getElementById("loudnessView");
 	vis_value = document.getElementById("loudnessValue");
@@ -75,11 +69,19 @@ window.onload=function(){
 	demoReq.responseType = "arraybuffer";
 	demoReq.onload = function(){
 		context.decodeAudioData(demoReq.response, function(buffer)
-			{demo_buffer = buffer;});
+			{demoFileBuffer = buffer;});
 		}
 
 	demoReq.send();
-	animation_function = draw_octaveband;
+	animation_function = vis_MyStyle;
+}
+
+
+function fileLoaded(e){
+	    context.decodeAudioData(e.target.result, function(buffer) {
+	      chosenFileBuffer = buffer;
+	    });
+	    console.log("File has been loaded.")
 }
 
 
@@ -90,75 +92,55 @@ function fileChanged(e){
 		fileReader.readAsArrayBuffer(file);
 }
 	
-function fileLoaded(e){
-	    context.decodeAudioData(e.target.result, function(buffer) {
-	      myAudioBuffer_localplayer = buffer;
-	    });
-	    console.log("File has been loaded.")
-}
 
-
-function playSound(anybuffer) {
-	  source = context.createBufferSource();
-	  source.buffer = anybuffer;
-	  source.connect(context.destination);
-	  source.start();
-}
-
-function stopSound(anybuffer) {
+/*
+function stopSound() {
 	  if (source) {
 	    source.stop();
 	  }
 }	
+*/
 
 
 
 
-function setAnimationFunction (mode_num) {
-	if (mode_num == 1) {
-		animation_function = draw_octaveband;
-	}
-	else if(mode_num == 2) {
-		animation_function = draw_MyOwn;		
-	}
-
-	if (demoPlayOn || micOn) {
-		stopAnimation();
-
-		// restart visualize audio animation
-		animation_id = setInterval(animation_function, context.sampleRate/analyser.fftSize);
-	}
-}
 
 
 
-function draw_octaveband() {
+
+function vis_MyStyle() {
 
 	// get samples 
 	var data_array = new Float32Array(analyser.frequencyBinCount);
 	analyser.getFloatFrequencyData(data_array);
 
-	var octaveband_level_db = calc_octaveband(data_array)
+	var octaveband_level_db = freq_slice(data_array)
 
 
-	// display the loudness value (this is for verifying if the level is correctly computed.)
+	// display the loudness value
 	var loudness = octaveband_level_db[0];
-	vis_value.innerHTML = '32Hz-Band Level (dB): ' + loudness + ' dB'
+	vis_value.innerHTML = 'Currently' + loudness + ' dB'
+
 
 	// 2d canvas context
 	var drawContext = vis_view.getContext('2d');
-	
+
+
 	// fill rectangular (for the entire canvas)
-	drawContext.fillStyle = 'rgb(255, 222, 208)';
+	drawContext.fillStyle = 'rgb(255, 222, 208)'; //light salmon
 	drawContext.fillRect(0, 0, WIDTH, HEIGHT);
+
 
 
 	for (var i=0; i<10; i++) {
 
 		// fill rectangular (for the sound level)
-		var sound_level = (octaveband_level_db[i]-SOUND_METER_MIN_LEVEL)/(0.0-SOUND_METER_MIN_LEVEL)*SOUND_METER_HEIGHT;
+		var sound_level = (octaveband_level_db[i]-SOUND_METER_MIN_LEVEL)/
+			(0.0-SOUND_METER_MIN_LEVEL)*20;
 		var sound_level_env;
 		
+
+
 		///// asymmetric envelope detector
 		if (sound_level < prev_band_level[i]) {
 			sound_level_env = prev_band_level[i];
@@ -170,66 +152,13 @@ function draw_octaveband() {
 
 			prev_band_level[i] = sound_level;
 		}
-		
-		// shape
-		drawContext.beginPath();
-		var x = SOUND_METER_GAP + (SOUND_METER_WIDTH+SOUND_METER_GAP)*i;
-		drawContext.rect(x, SOUND_METER_HEIGHT, SOUND_METER_WIDTH, -sound_level_env);
 
-		// color
-		var hue = Math.floor(255/9*i);
-		var saturation = 255;
-		var value = 255;
-		var rgb = hsvToRgb(hue, saturation, value);
-		drawContext.fillStyle='rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'; 
-		drawContext.fill();
-	}
-
-}
-
-
-
-function draw_MyOwn() {
-	// get samples 
-	var data_array = new Float32Array(analyser.frequencyBinCount);
-	analyser.getFloatFrequencyData(data_array);
-
-	var octaveband_level_db = calc_octaveband(data_array)
-
-	// display the loudness value (this is for verifying if the level is correctly computed.)
-	var loudness = octaveband_level_db[0];
-	vis_value.innerHTML = '32Hz-Band Level (dB): ' + loudness + ' dB'
-
-	// 2d canvas context
-	var drawContext = vis_view.getContext('2d');
-
-	// fill rectangular (for the entire canvas)
-	drawContext.fillStyle = 'rgb(255, 222, 208)';
-	drawContext.fillRect(0, 0, WIDTH, HEIGHT);
-
-
-	for (var i=0; i<10; i++) {
-
-		// fill rectangular (for the sound level)
-		var sound_level = (octaveband_level_db[i]-SOUND_METER_MIN_LEVEL)/(0.0-SOUND_METER_MIN_LEVEL)*20;
-		var sound_level_env;
-		
-		///// asymmetric envelope detector
-		if (sound_level < prev_band_level[i]) {
-			sound_level_env = prev_band_level[i];
-
-			prev_band_level[i] = prev_band_level[i]*0.95;
-		} 
-		else {
-			sound_level_env = sound_level;
-
-			prev_band_level[i] = sound_level;
-		}
 
 		//shape
 		drawContext.beginPath();
 		var r = 30 + (10-i)*sound_level_env;
 		drawContext.arc(WIDTH/2, HEIGHT/2, r, 0, 2*Math.PI, true);
+
 
 		//color
 		var hue = Math.floor(255/9*i);
@@ -240,11 +169,15 @@ function draw_MyOwn() {
 		drawContext.fill();
 	}
 	
+
+
 	drawContext.beginPath();
 	drawContext.arc(WIDTH/2, HEIGHT/2, 30, 0, 2*Math.PI, true);
 	drawContext.fillStyle='rgb(255, 222, 208)';
 	drawContext.fill();
 	
+
+
 	var image = new Image();
 	image.src = 'musicalnote2.png';
 	image.addEventListener('load', eventimageLoaded, false);
@@ -254,13 +187,43 @@ function draw_MyOwn() {
 }
 
 
-function playMic()
+
+
+
+
+
+function playSound(anybuffer) {
+	  source = context.createBufferSource();
+	  source.buffer = anybuffer;
+	  source.connect(context.destination);
+	  source.start();
+}
+
+
+function stopSound(anybuffer) {
+	  if (source) {
+	    source.stop();
+	  }
+}
+
+function stopAnimation() { 
+	clearInterval(animation_id);
+}
+
+
+
+
+
+
+
+
+function playMicAudio()
 {
 	if (demoPlayOn) {
 		turnOffDemoAudio();
 		return;
 	}
-	if (micOn) {
+	if (micPlayOn) {
 		turnOffMicAudio();
 		return;
 	}
@@ -274,27 +237,27 @@ function playMic()
 	// get audio input streaming 				 
 	navigator.getUserMedia({audio: true}, onStream, onStreamError)
 
-	micOn = true;
+	micPlayOn = true;
 
 	var mic = document.getElementById("micInput");
 	mic.innerHTML = 'Mic Off'
 }
 
 
-function playDemo() {
+function playDemoAudio() {
 	
 	if (filePlayOn) {
 		turnOffFileAudio();
 		return;
 	}
-	if (micOn) {
+	if (micPlayOn) {
 		turnOffMicAudio();
 		return;
 	}
 
 	sourceNode = context.createBufferSource();
 
-	sourceNode.buffer = demo_buffer;
+	sourceNode.buffer = demoFileBuffer;
 	sourceNode.connect(context.destination);
 	sourceNode.start(0);
 
@@ -310,15 +273,13 @@ function playDemo() {
 }
 
 
-
-
-function playFile() {
+function playFileAudio() {
 	
 	if (demoPlayOn) {
 		turnOffFileAudio();
 		return;
 	}
-	if (micOn) {
+	if (micPlayOn) {
 		turnOfMicAudio();
 		return;
 	}
@@ -347,6 +308,17 @@ function playFile() {
 
 
 
+
+
+function turnOffMicAudio() {
+	var MicAudio = document.getElementById("micInput");		
+	MicAudio.innerHTML = 'Mic On'
+	mediaSourceNode = null;
+	micPlayOn = false;
+
+	stopAnimation();
+}
+
 function turnOffDemoAudio() {
 	var DemoAudio = document.getElementById("demoAudioInput");
 	DemoAudio.innerHTML = 'Demo Audio Play'
@@ -357,17 +329,8 @@ function turnOffDemoAudio() {
 	stopAnimation();
 }
 
-function turnOffMicAudio() {
-	var MicAudio = document.getElementById("micInput");		
-	MicAudio.innerHTML = 'Mic On'
-	mediaSourceNode = null;
-	micOn = false;
-
-	stopAnimation();
-}
-
 function turnOffFileAudio() {
-	var FileAudio = document.getElementById("fileChooseInput");
+	var FileAudio = document.getElementById("chosenFileInput");
 	DemoAudio.innerHTML = 'File Play'
 	sourceNode.stop(0);
 	sourceNode = null;
@@ -375,6 +338,11 @@ function turnOffFileAudio() {
 
 	stopAnimation();
 }
+
+
+
+
+
 
 
 
@@ -395,13 +363,11 @@ function onStream(stream) {
 // mic errorCallback			 
 function onStreamError(error) {
 	console.error('Error getting microphone', error);
-	micOn = false;
+	micPlayOn = false;
 }
 
 
 
 
-function stopAnimation() { 
-	clearInterval(animation_id);
-}
+
 

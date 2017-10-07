@@ -7,8 +7,8 @@
 	<link rel="stylesheet" href="./visCss.css" type="text/css">
 
 	<script type="text/javascript" src="./MusicVisualizer.js"></script>
-	<script type="text/javascript" src="./octave_band.js"></script>
-	<script type="text/javascript" src="./hsv2rgb.js"></script>
+	<script type="text/javascript" src="./freq_slice.js"></script>
+	<script type="text/javascript" src="./colorize.js"></script>
 	
 </head>
 <body>		
@@ -16,16 +16,16 @@
 	<font size="6">Music Visualizer</font><br><br>
 
 	  1. <button id="micInput"> Mic On </button>
-	/ 2. <button id="demoAudioInput">Play Sample Audio</button>
-	/ 3. <input id = "fileChooseInput" type = "file"></input> <button onclick="playSound(myAudioBuffer_localplayer)">Play</button>
+	/ 2. <button id="demoFileInput">Play Sample Audio</button>
+	/ 3. <input id = "chosenFileInput" type = "file"></input> <button onclick="playSound(myFileBuffer_MusicVisualizer)">Play</button>
 	  <button onclick="stopSound()">Stop</button>
 
 
 	<p><canvas id='loudnessView' style="background:#FFDED0;"></canvas></p>
 	<!-- color of visualizer canvas -->
 
-  	<input id="visMode1" type="radio" name="mode" value="10-Band Level Meter" checked="checked"> <font size="3">10-Band Level Meter</font>
-  	<input id="visMode2" type="radio" name="mode" value="other"> <font size="3">My Own Style</font>
+  	<!--<input id="visMode1" type="radio" name="mode" value="10-Band Level Meter" checked="checked"> <font size="3">10-Band Level Meter</font>
+  	<input id="visMode2" type="radio" name="mode" value="other"> <font size="3">My Own Style</font> -->
 
 	<p id='loudnessValue'> </p>
 

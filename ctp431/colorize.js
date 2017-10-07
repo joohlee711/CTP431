@@ -1,8 +1,4 @@
-//
-// Obtained from https://gist.github.com/eyecatchup/9536706
-//
-
-function hsvToRgb(h, s, v) {
+function colorize(h, s, v) {
     var r, g, b;
     var i;
     var f, p, q, t;
