@@ -1,4 +1,4 @@
-
+// -------- Variables -------
 
 var context;
 var source = null;
@@ -38,38 +38,31 @@ for (var i=0; i <10;i++ ) {
 window.onload=function(){
 	var MicAudio = document.getElementById("micInput");
 	MicAudio.addEventListener("click", playMicAudio, false);
-
 	var DemoAudio = document.getElementById("demoFileInput");
 	DemoAudio.addEventListener("click", playDemoAudio, false);
-
 	var FileAudio = document.getElementById("chosenFileInput");
 	FileAudio.addEventListener("change", fileChanged, false);
 	window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
+	// create audio context
+	context = new AudioContext();
+
 	var visMod1 = document.getElementById("visMode1");
 	visMod1.addEventListener("click", function(){
-			setAnimationFunction(1)	
-	}, false); 
-
+			setAnimationFunction(1)}, false); 
 	var visMod2 = document.getElementById("visMode2");
 	visMod2.addEventListener("click", function(){
-			setAnimationFunction(2)	
-	}, false); 
+			setAnimationFunction(2)}, false); 
 
 	vis_view = document.getElementById("loudnessView");
 	vis_value = document.getElementById("loudnessValue");
 	vis_view.width =  WIDTH;
 	vis_view.height = HEIGHT;
-
-	
-	// create audio context
-	context = new AudioContext();
 	
 	// analyzer
 	analyser = context.createAnalyser();
 	analyser.fftSize = 2048;
 	analyser.smoothingTimeConstant = 0;		
-
 
 	var demoReq = new XMLHttpRequest();
 	demoReq.open("Get","SlippyCut.mp3",true);
@@ -299,7 +292,7 @@ function draw_styleOne() {
 	var data_array = new Float32Array(analyser.frequencyBinCount);
 	analyser.getFloatFrequencyData(data_array);
 
-	var octaveband_level_db = calc_octaveband(data_array)
+	var octaveband_level_db = freq_slice(data_array)
 
 
 	// display the loudness value (this is for verifying if the level is correctly computed.)
@@ -341,7 +334,7 @@ function draw_styleOne() {
 		var hue = Math.floor(255/9*i);
 		var saturation = 255;
 		var value = 255;
-		var rgb = hsvToRgb(hue, saturation, value);
+		var rgb = freq_slice(hue, saturation, value);
 		drawContext.fillStyle='rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'; 
 		drawContext.fill();
 	}
@@ -355,7 +348,7 @@ function draw_styleTwo() {
 	var data_array = new Float32Array(analyser.frequencyBinCount);
 	analyser.getFloatFrequencyData(data_array);
 
-	var octaveband_level_db = calc_octaveband(data_array)
+	var octaveband_level_db = freq_slice(data_array)
 
 	// display the loudness value (this is for verifying if the level is correctly computed.)
 	var loudness = octaveband_level_db[0];
@@ -396,7 +389,7 @@ function draw_styleTwo() {
 		var hue = Math.floor(255/9*i);
 		var saturation = 255;
 		var value = 255;
-		var rgb = hsvToRgb(hue, saturation, value);
+		var rgb = freq_slice(hue, saturation, value);
 		drawContext.fillStyle='rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'; 
 		drawContext.fill();
 	}
