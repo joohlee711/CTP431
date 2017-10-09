@@ -1,4 +1,8 @@
-function colorize(h, s, v) {
+//
+// Obtained from https://gist.github.com/eyecatchup/9536706
+//
+
+function hsvToRgb(h, s, v) {
     var r, g, b;
     var i;
     var f, p, q, t;
@@ -12,7 +16,6 @@ function colorize(h, s, v) {
     // how Photoshop represents those values. Internally, however, the
     // saturation and value are calculated from a range of 0 to 1. We make
     // That conversion here.
-    
     s /= 100;
     v /= 100;
      
