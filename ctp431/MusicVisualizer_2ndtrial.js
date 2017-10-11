@@ -39,7 +39,7 @@ for (var i=0; i <10;i++ ) {
 
 
 window.onload=function(){
-	var MicAudio = document.getElementById("micInput");
+	var MicAudio = document.getElementById("micFileInput");
 	MicAudio.addEventListener("click", playMicAudio, false);
 	var DemoAudio = document.getElementById("demoFileInput");
 	DemoAudio.addEventListener("click", playDemoAudio, false);
