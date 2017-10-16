@@ -290,7 +290,7 @@ function playMicAudio()
 
 	micPlayOn = true;
 
-	var mic = document.getElementById("micInput");
+	var mic = document.getElementById("micFileInput");
 	mic.innerHTML = 'Mic Off'
 }
 
@@ -299,8 +299,9 @@ function playDemoAudio() {
 	
 	if (filePlayOn) {
 		turnOffFileAudio();
-		return;
+		//return;
 	}
+
 	if (micPlayOn) {
 		turnOffMicAudio();
 		return;
@@ -319,7 +320,7 @@ function playDemoAudio() {
 
 	demoPlayOn = true;
 	
-	var DemoAudio = document.getElementById("DemoAudio");
+	var DemoAudio = document.getElementById("demoFileInput");
 	DemoAudio.innerHTML = 'Demo Audio Stop'
 }
 
@@ -358,7 +359,7 @@ function playFileAudio() {
 
 
 function turnOffMicAudio() {
-	var MicAudio = document.getElementById("micInput");		
+	var MicAudio = document.getElementById("micFileInput");		
 	MicAudio.innerHTML = 'Mic On'
 	mediaSourceNode = null;
 	micPlayOn = false;
