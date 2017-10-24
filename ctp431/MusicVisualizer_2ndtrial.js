@@ -357,7 +357,7 @@ function playFileAudio() {
 	filePlayOn = true;
 	
 	var FileAudio = document.getElementById("chosenFileInput");
-	FileAudio.innerHTML = 'Selected File Stop'
+
 }
 
 
@@ -385,7 +385,6 @@ function turnOffDemoAudio() {
 
 function turnOffFileAudio() {
 	var FileAudio = document.getElementById("chosenFileInput");
-	DemoAudio.innerHTML = 'File Play'
 	sourceNode.stop(0);
 	sourceNode = null;
 	filePlayOn = false;
