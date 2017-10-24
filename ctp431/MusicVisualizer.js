@@ -4,8 +4,10 @@
 var context;
 var source = null;
 
-var chosenFileBuffer = null; // myaudiobuffer in localplayer example
+// no mic buffer
 var demoFileBuffer;
+var chosenFileBuffer = null; // myaudiobuffer in localplayer example
+
 
 var sourceNode = null;
 var mediaSourceNode = null;
