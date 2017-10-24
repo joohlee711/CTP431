@@ -1,5 +1,20 @@
 // -------- Variables -------
 
+var bgColor
+
+var WIDTH = 970;
+var HEIGHT = 350;
+// var SOUND_METER_GAP = 15;
+// var SOUND_METER_WIDTH = 40;
+// var SOUND_METER_HEIGHT = HEIGHT;
+// var SOUND_METER_MIN_LEVEL = -96.0;  // dB
+
+var FFT_front
+var FFT_back
+var amplitude
+var canvas
+var gain
+
 
 var context;
 var source = null;
@@ -17,12 +32,7 @@ var analyser = null;
 var vis_view;
 var vis_value;
 
-var WIDTH = 600;
-var HEIGHT = 380;
-var SOUND_METER_GAP = 15;
-var SOUND_METER_WIDTH = 40;
-var SOUND_METER_HEIGHT = HEIGHT;
-var SOUND_METER_MIN_LEVEL = -96.0;  // dB
+
 
 var micPlayOn = false;
 var demoPlayOn = false;
@@ -135,65 +145,107 @@ function setAnimationFunction (mode_num) {
 
 
 
-
-
-
 // ---------------- Visualization Part ---------
+
+function setup(){
+
+	canvas = createCanvas(WIDTH, HEIGHT)
+	canvas.parent('sketch-holder')
+	colorMode(HSB)
+	angleMode(DEGREES)
+	FFT_front = new p5.FFT(0.7, 128)
+	FFT_back = new p5.FFT(0.85, 32)
+	amplitude = new p5.Amplitude(0.8)
+	//button setting
+	for(var i = 0; i <= numberOfSong; i++){
+		buttons[i] = select('#button'+ String(i))
+	}
+	buttons[0].position(20, HEIGHT-70)
+	for(var i = 1; i <= numberOfSong; i++){
+		buttons[i].position(buttons[i-1].x + buttons[i-1].width + 5, HEIGHT-70)
+	}
+}
 
 
 
 function draw_styleOne() {
+	//start_angle = (start_angle + 0.3) % 360
+	// center : 0,0
+	translate(WIDTH/2, HEIGHT/2)
+	// fft analyze
+	var spectrum = fft.analyze();
+	var spectrum2 = fft2.analyze();
+	var level = amplitude.getLevel()
 
-	// get samples 
-	var data_array = new Float32Array(analyser.frequencyBinCount);
-	analyser.getFloatFrequencyData(data_array);
+	// background
+	image(bg, -(WIDTH/2), -(HEIGHT/2), WIDTH, HEIGHT)
 
-	var octaveband_level_db = freq_slice(data_array)
+	// down EQ
+	Start = 2;
+	End = spectrum2.length - 3
+	var w = (WIDTH/2) / (End - Start)
 
-
-	// display the loudness value (this is for verifying if the level is correctly computed.)
-	var loudness = octaveband_level_db[0];
-	vis_value.innerHTML = '32Hz-Band Level (dB): ' + loudness + ' dB'
-
-	// 2d canvas context
-	var drawContext = vis_view.getContext('2d');
-	
-	// fill rectangular (for the entire canvas)
-	drawContext.fillStyle = 'rgb(255, 222, 208)';
-	drawContext.fillRect(0, 0, WIDTH, HEIGHT);
-
-
-	for (var i=0; i<10; i++) {
-
-		// fill rectangular (for the sound level)
-		var sound_level = (octaveband_level_db[i]-SOUND_METER_MIN_LEVEL)/(0.0-SOUND_METER_MIN_LEVEL)*SOUND_METER_HEIGHT;
-		var sound_level_env;
-		
-		///// asymmetric envelope detector
-		if (sound_level < prev_band_level[i]) {
-			sound_level_env = prev_band_level[i];
-
-			prev_band_level[i] = prev_band_level[i]*0.95;
-		} 
-		else {
-			sound_level_env = sound_level;
-
-			prev_band_level[i] = sound_level;
-		}
-		
-		// shape
-		drawContext.beginPath();
-		var x = SOUND_METER_GAP + (SOUND_METER_WIDTH+SOUND_METER_GAP)*i;
-		drawContext.rect(x, SOUND_METER_HEIGHT, SOUND_METER_WIDTH, -sound_level_env);
-
-		// color
-		var hue = Math.floor(255/9*i);
-		var saturation = 255;
-		var value = 255;
-		var rgb = freq_slice(hue, saturation, value);
-		drawContext.fillStyle='rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'; 
-		drawContext.fill();
+	noStroke();
+	for (var i = Start; i < End; i++){
+		var amp = spectrum2[i]**2
+		var x = map(i, Start, End, (WIDTH/2), 0)
+		var h = map(amp, 0, 256**2, 0, 300)
+		var y = - h / 2
+		fill(0,0,60)
+		rect(x, y, w*0.9, h)
+		rect(-x-w, y, w*0.9, h)
 	}
+
+	// center circle spectrums
+	strokeWeight(5.5)
+	Start = 20
+	End = spectrum.length - 20
+	// right half
+	for (var i = Start; i < End; i++){
+		// set r and angle
+		// amp : **2 to make dynamic changes
+		// map : lower freq -> smaller, high freq -> bigger changes
+		var amp = (spectrum[i]**3) * map(i, Start, End, 0.6, 1.0)
+		var angle = map(i, Start, End, -90, 90)
+		var r = map(amp, 0, 256**3, 205, 550);
+		// x, y from r, angle
+		var x = r*cos(angle)
+		var y = r*sin(angle)
+		// draw line
+		stroke(map(i, Start, End, 0, 255), 255, 255)
+		line(0, 0, x, y)
+	}
+	for (var i = Start; i < End; i++){
+		// set r and angle
+		var amp = (spectrum[i]**3) * map(i, Start, End, 0.6, 1.0)
+		var angle = map(i, Start, End, 270, 90)
+		var r = map(amp, 0, 256**3, 205, 550);
+		// x, y from r, angle
+		var x = r*cos(angle)
+		var y = r*sin(angle)
+		// draw line
+		stroke(map(i, Start, End, 0, 255), 255, 255)
+		line(0, 0, x, y)
+	}
+
+
+
+	level_over_4 = Math.max(0.4, level)
+
+	// center circle
+	fill(0,0,0)
+	noStroke()
+	var c_size = map(level_over_4, 0.4, 1.0, 400, 450)
+	ellipse(0, 0, c_size, c_size)
+
+	// cener title
+	fill(0,0,255)
+	stroke(0,0,0)
+	textAlign(CENTER)
+	var t_size = map(level_over_4, 0.4, 1.0, 40, 50)
+	textSize(t_size)
+	text(title, 0, 0)
+
 
 }
 

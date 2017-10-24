@@ -9,6 +9,11 @@
 	<script type="text/javascript" src="./MusicVisualizer.js"></script>
 	<script type="text/javascript" src="./freq_slice.js"></script>
 	<script type="text/javascript" src="./colorize.js"></script>
+	<script src="library/p5.js"></script>
+	<script src="library/p5.dom.js"></script>
+	<script src="library/p5.sound.js"></script>
+	<script src="sketch.js"></script>
+
 	
 </head>
 <body>		
@@ -17,16 +22,10 @@
 
 	  1. <button id="micFileInput"> Mic On </button>
 	/ 2. <button id="demoFileInput">Play Sample Audio</button>
-	/ 3. <input id="chosenFileInput" type="file"> <button onclick="playFileAudio(chosenFileBuffer)">Play</button>
+	/ 3. <input id="chosenFileInput" type="file"> <button onclick="playFileAudio(chosenFileBuffer)">Play</button> <button onclick="turnOffFileAudio()">Stop</button> / <p id="loudnessValue"> </p>
 
 	<p><canvas id="loudnessView" style="background:#FFDED0;"></canvas></p>
 
-	 <button onclick="turnOffFileAudio()">Stop</button> / <p id="loudnessValue"> </p>
-
-  	<input id="visMode1" type="radio" name="mode" value="10-Band Level Meter" checked="checked"> <font size="3">Style 1</font>
-  	<input id="visMode2" type="radio" name="mode" value="other"> <font size="3">Stlye 2</font>
-
-	
 
 	
 </body></html>
