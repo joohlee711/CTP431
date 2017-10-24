@@ -7,16 +7,16 @@
 
  	body{
 
- 		background-color: #380070; /* color of page background */
+ 		background-color: '#e5e5e5'; /* color of page background */
  		
-  		color: #00A081; /*color of text itself*/
- 		font-size: 1.3em;
- 		font-weight: 100;
- 		font-family: "Trebuchet MS", Helvetica, sans-serif;
- 		text-shadow: 0px 0px 7px #00A081; /* color of text shadow */
- 	}S
+  		color: #000;
+ 		font-size: 1.1em;
+ 		font-weight: 300;
+ 		font-family: 'Raleway', sans-serif;
+ 		text-shadow: 0px 0px 5px #333;
+ 	}
 
- 	canvas{
- 		width: 90%;
- 		height: 75%;
+  	canvas{
+ 		width: 970px;
+ 		height: 350px;
 	}
