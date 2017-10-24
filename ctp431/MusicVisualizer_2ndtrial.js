@@ -304,7 +304,7 @@ function playDemoAudio() {
 
 	if (micPlayOn) {
 		turnOffMicAudio();
-		return;
+		//return;
 	}
 
 	sourceNode = context.createBufferSource();
