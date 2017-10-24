@@ -307,6 +307,11 @@ function playDemoAudio() {
 		//return;
 	}
 
+	if (demoPlayOn) {
+		turnOffDemoAudio();
+		return;
+	}
+
 	sourceNode = context.createBufferSource();
 
 	sourceNode.buffer = demo_buffer;
@@ -351,7 +356,7 @@ function playFileAudio() {
 
 	filePlayOn = true;
 	
-	var FileAudio = document.getElementById("FileAudio");
+	var FileAudio = document.getElementById("chosenFileInput");
 	FileAudio.innerHTML = 'Selected File Stop'
 }
 
@@ -368,7 +373,7 @@ function turnOffMicAudio() {
 }
 
 function turnOffDemoAudio() {
-	var DemoAudio = document.getElementById("demoAudioInput");
+	var DemoAudio = document.getElementById("demoFileInput");
 	DemoAudio.innerHTML = 'Demo Audio Play'
 	sourceNode.stop(0);
 	sourceNode = null;
