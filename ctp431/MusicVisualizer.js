@@ -1,11 +1,13 @@
 // -------- Variables -------
 
-
+var bgColor
 var context;
 var source = null;
 
-var chosenFileBuffer = null; // myaudiobuffer in localplayer example
+// no mic buffer
 var demoFileBuffer;
+var chosenFileBuffer = null; // myaudiobuffer in localplayer example
+
 
 var sourceNode = null;
 var mediaSourceNode = null;
@@ -89,7 +91,7 @@ function fileChanged(e){
 	
 function fileLoaded(e){
 	    context.decodeAudioData(e.target.result, function(buffer) {
-	      chosenFileBuffer_localplayer = buffer;
+	      chosenFileBuffer = buffer;
 	    });
 	    console.log("File has been loaded.")
 }
@@ -290,7 +292,7 @@ function playMicAudio()
 
 	micPlayOn = true;
 
-	var mic = document.getElementById("micInput");
+	var mic = document.getElementById("micFileInput");
 	mic.innerHTML = 'Mic Off'
 }
 
@@ -299,10 +301,16 @@ function playDemoAudio() {
 	
 	if (filePlayOn) {
 		turnOffFileAudio();
-		return;
+		//return;
 	}
+
 	if (micPlayOn) {
 		turnOffMicAudio();
+		//return;
+	}
+
+	if (demoPlayOn) {
+		turnOffDemoAudio();
 		return;
 	}
 
@@ -319,7 +327,7 @@ function playDemoAudio() {
 
 	demoPlayOn = true;
 	
-	var DemoAudio = document.getElementById("DemoAudio");
+	var DemoAudio = document.getElementById("demoFileInput");
 	DemoAudio.innerHTML = 'Demo Audio Stop'
 }
 
@@ -350,15 +358,15 @@ function playFileAudio() {
 
 	filePlayOn = true;
 	
-	var FileAudio = document.getElementById("FileAudio");
-	FileAudio.innerHTML = 'Selected File Stop'
+	var FileAudio = document.getElementById("chosenFileInput");
+
 }
 
 
 
 
 function turnOffMicAudio() {
-	var MicAudio = document.getElementById("micInput");		
+	var MicAudio = document.getElementById("micFileInput");		
 	MicAudio.innerHTML = 'Mic On'
 	mediaSourceNode = null;
 	micPlayOn = false;
@@ -367,7 +375,7 @@ function turnOffMicAudio() {
 }
 
 function turnOffDemoAudio() {
-	var DemoAudio = document.getElementById("demoAudioInput");
+	var DemoAudio = document.getElementById("demoFileInput");
 	DemoAudio.innerHTML = 'Demo Audio Play'
 	sourceNode.stop(0);
 	sourceNode = null;
@@ -379,7 +387,6 @@ function turnOffDemoAudio() {
 
 function turnOffFileAudio() {
 	var FileAudio = document.getElementById("chosenFileInput");
-	DemoAudio.innerHTML = 'File Play'
 	sourceNode.stop(0);
 	sourceNode = null;
 	filePlayOn = false;
