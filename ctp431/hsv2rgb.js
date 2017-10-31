@@ -1,4 +1,4 @@
-function colorize(h, s, v) {
+function hsv2rgb(h, s, v) {
     var r, g, b;
     var i;
     var f, p, q, t;
