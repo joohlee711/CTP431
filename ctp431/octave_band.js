@@ -1,4 +1,4 @@
-function octave_band(input_array) {
+function calc_octaveband(input_array) {
 	var lower_freqs = [22, 44, 88, 177, 355, 710, 1420, 2840, 5680, 11360];
 	var upper_freqs = [44, 88, 177, 355, 710, 1420, 2840, 5680, 11360, 22720];
 	var center_freqs = [31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
