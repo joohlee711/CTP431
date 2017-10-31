@@ -64,7 +64,7 @@ window.onload=function(){
 
 
 	var demoReq = new XMLHttpRequest();
-	demoReq.open("Get","SlippyCut.mp3",true);
+	demoReq.open("Get","rensacut.mp3",true);
 	demoReq.responseType = "arraybuffer";
 	demoReq.onload = function(){
 		context.decodeAudioData(demoReq.response, function(buffer)
@@ -127,7 +127,7 @@ function fileChanged(e){
 	
 function fileLoaded(e){
 	    context.decodeAudioData(e.target.result, function(buffer) {
-	      myAudioBuffer_localplayer = buffer;
+	      myAudioBuffer = buffer;
 
 	    });
 	    console.log("File has been loaded.")
@@ -166,7 +166,7 @@ function drawBand() {
 	var drawContext = vis_view.getContext('2d');
 	
 	// fill rectangular (for the entire canvas)
-	drawContext.fillStyle = 'rgb(20, 30, 100)';
+	drawContext.fillStyle = 'rgb(255, 255, 255)';
 	drawContext.fillRect(0, 0, WIDTH, HEIGHT);
 
 
@@ -202,9 +202,9 @@ function drawBand() {
 		}
 
 		else {
-			intensity[0] = 200;
+			intensity[0] = 0;
 			intensity[1] = 100;
-			intensity[2] = 150;
+			intensity[2] = 255;
 		}
 
 		drawContext.fillStyle='rgb(' + intensity[0] + ',' + intensity[1] + ',' + intensity[2] + ')'; 
