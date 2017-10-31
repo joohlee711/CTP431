@@ -1,18 +1,12 @@
-// -------- Variables -------
 
-var bgColor
+
 var context;
 var source = null;
-
-// no mic buffer
-var demoFileBuffer;
-var chosenFileBuffer = null; // myaudiobuffer in localplayer example
-
+var myAudioBuffer = null;
 
 var sourceNode = null;
 var mediaSourceNode = null;
 var analyser = null;
-
 
 var vis_view;
 var vis_value;
@@ -24,7 +18,7 @@ var SOUND_METER_WIDTH = 40;
 var SOUND_METER_HEIGHT = HEIGHT;
 var SOUND_METER_MIN_LEVEL = -96.0;  // dB
 
-var micPlayOn = false;
+var micOn = false;
 var demoPlayOn = false;
 var filePlayOn = false;
 
@@ -37,37 +31,44 @@ for (var i=0; i <10;i++ ) {
 }
 
 
-// --------- Controlling part --------
 
+var demo_buffer;
 
 window.onload=function(){
-	var MicAudio = document.getElementById("micFileInput");
-	MicAudio.addEventListener("click", playMicAudio, false);
-	var DemoAudio = document.getElementById("demoFileInput");
-	DemoAudio.addEventListener("click", playDemoAudio, false);
-	var FileAudio = document.getElementById("chosenFileInput");
+	var MicAudio = document.getElementById("micInput");
+	MicAudio.addEventListener("click", playMic, false);
+
+	var DemoAudio = document.getElementById("demoAudioInput");
+	DemoAudio.addEventListener("click", playDemo, false);
+
+	var FileAudio = document.getElementById("fileChooseInput");
 	FileAudio.addEventListener("change", fileChanged, false);
 	window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-	// create audio context
-	context = new AudioContext();
-
 	var visMod1 = document.getElementById("visMode1");
 	visMod1.addEventListener("click", function(){
-			setAnimationFunction(1)}, false); 
+			setAnimationFunction(1)	
+	}, false); 
+
 	var visMod2 = document.getElementById("visMode2");
 	visMod2.addEventListener("click", function(){
-			setAnimationFunction(2)}, false); 
+			setAnimationFunction(2)	
+	}, false); 
 
 	vis_view = document.getElementById("loudnessView");
 	vis_value = document.getElementById("loudnessValue");
 	vis_view.width =  WIDTH;
 	vis_view.height = HEIGHT;
+
+	
+	// create audio context
+	context = new AudioContext();
 	
 	// analyzer
 	analyser = context.createAnalyser();
 	analyser.fftSize = 2048;
 	analyser.smoothingTimeConstant = 0;		
+
 
 	var demoReq = new XMLHttpRequest();
 	demoReq.open("Get","SlippyCut.mp3",true);
@@ -78,7 +79,7 @@ window.onload=function(){
 		}
 
 	demoReq.send();
-	animation_function = draw_styleOne;
+	animation_function = draw_octaveband;
 }
 
 
@@ -91,7 +92,7 @@ function fileChanged(e){
 	
 function fileLoaded(e){
 	    context.decodeAudioData(e.target.result, function(buffer) {
-	      chosenFileBuffer = buffer;
+	      myAudioBuffer_localplayer = buffer;
 	    });
 	    console.log("File has been loaded.")
 }
@@ -110,21 +111,18 @@ function stopSound(anybuffer) {
 	  }
 }	
 
-function stopAnimation() { 
-	clearInterval(animation_id);
-}
 
 
 
 function setAnimationFunction (mode_num) {
 	if (mode_num == 1) {
-		animation_function = draw_styleOne;
+		animation_function = draw_octaveband;
 	}
 	else if(mode_num == 2) {
-		animation_function = draw_styleTwo;		
+		animation_function = draw_MyOwn;		
 	}
 
-	if (demoPlayOn || micPlayOn) {
+	if (demoPlayOn || micOn) {
 		stopAnimation();
 
 		// restart visualize audio animation
@@ -134,21 +132,13 @@ function setAnimationFunction (mode_num) {
 
 
 
-
-
-
-
-// ---------------- Visualization Part ---------
-
-
-
-function draw_styleOne() {
+function draw_octaveband() {
 
 	// get samples 
 	var data_array = new Float32Array(analyser.frequencyBinCount);
 	analyser.getFloatFrequencyData(data_array);
 
-	var octaveband_level_db = freq_slice(data_array)
+	var octaveband_level_db = calc_octaveband(data_array)
 
 
 	// display the loudness value (this is for verifying if the level is correctly computed.)
@@ -190,7 +180,7 @@ function draw_styleOne() {
 		var hue = Math.floor(255/9*i);
 		var saturation = 255;
 		var value = 255;
-		var rgb = freq_slice(hue, saturation, value);
+		var rgb = hsvToRgb(hue, saturation, value);
 		drawContext.fillStyle='rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'; 
 		drawContext.fill();
 	}
@@ -199,12 +189,12 @@ function draw_styleOne() {
 
 
 
-function draw_styleTwo() {
+function draw_MyOwn() {
 	// get samples 
 	var data_array = new Float32Array(analyser.frequencyBinCount);
 	analyser.getFloatFrequencyData(data_array);
 
-	var octaveband_level_db = freq_slice(data_array)
+	var octaveband_level_db = calc_octaveband(data_array)
 
 	// display the loudness value (this is for verifying if the level is correctly computed.)
 	var loudness = octaveband_level_db[0];
@@ -245,7 +235,7 @@ function draw_styleTwo() {
 		var hue = Math.floor(255/9*i);
 		var saturation = 255;
 		var value = 255;
-		var rgb = freq_slice(hue, saturation, value);
+		var rgb = hsvToRgb(hue, saturation, value);
 		drawContext.fillStyle='rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'; 
 		drawContext.fill();
 	}
@@ -264,19 +254,13 @@ function draw_styleTwo() {
 }
 
 
-
-
-
-
-// ------------ Playing Part -----------
-
-function playMicAudio()
+function playMic()
 {
 	if (demoPlayOn) {
 		turnOffDemoAudio();
 		return;
 	}
-	if (micPlayOn) {
+	if (micOn) {
 		turnOffMicAudio();
 		return;
 	}
@@ -290,27 +274,21 @@ function playMicAudio()
 	// get audio input streaming 				 
 	navigator.getUserMedia({audio: true}, onStream, onStreamError)
 
-	micPlayOn = true;
+	micOn = true;
 
-	var mic = document.getElementById("micFileInput");
+	var mic = document.getElementById("micInput");
 	mic.innerHTML = 'Mic Off'
 }
 
 
-function playDemoAudio() {
+function playDemo() {
 	
 	if (filePlayOn) {
 		turnOffFileAudio();
-		//return;
+		return;
 	}
-
-	if (micPlayOn) {
+	if (micOn) {
 		turnOffMicAudio();
-		//return;
-	}
-
-	if (demoPlayOn) {
-		turnOffDemoAudio();
 		return;
 	}
 
@@ -327,20 +305,20 @@ function playDemoAudio() {
 
 	demoPlayOn = true;
 	
-	var DemoAudio = document.getElementById("demoFileInput");
+	var DemoAudio = document.getElementById("DemoAudio");
 	DemoAudio.innerHTML = 'Demo Audio Stop'
 }
 
 
 
 
-function playFileAudio() {
+function playFile() {
 	
 	if (demoPlayOn) {
 		turnOffFileAudio();
 		return;
 	}
-	if (micPlayOn) {
+	if (micOn) {
 		turnOfMicAudio();
 		return;
 	}
@@ -358,24 +336,19 @@ function playFileAudio() {
 
 	filePlayOn = true;
 	
-	var FileAudio = document.getElementById("chosenFileInput");
-
+	var FileAudio = document.getElementById("FileAudio");
+	FileAudio.innerHTML = 'Selected File Stop'
 }
 
 
 
 
-function turnOffMicAudio() {
-	var MicAudio = document.getElementById("micFileInput");		
-	MicAudio.innerHTML = 'Mic On'
-	mediaSourceNode = null;
-	micPlayOn = false;
 
-	stopAnimation();
-}
+
+
 
 function turnOffDemoAudio() {
-	var DemoAudio = document.getElementById("demoFileInput");
+	var DemoAudio = document.getElementById("demoAudioInput");
 	DemoAudio.innerHTML = 'Demo Audio Play'
 	sourceNode.stop(0);
 	sourceNode = null;
@@ -384,9 +357,18 @@ function turnOffDemoAudio() {
 	stopAnimation();
 }
 
+function turnOffMicAudio() {
+	var MicAudio = document.getElementById("micInput");		
+	MicAudio.innerHTML = 'Mic On'
+	mediaSourceNode = null;
+	micOn = false;
+
+	stopAnimation();
+}
 
 function turnOffFileAudio() {
-	var FileAudio = document.getElementById("chosenFileInput");
+	var FileAudio = document.getElementById("fileChooseInput");
+	DemoAudio.innerHTML = 'File Play'
 	sourceNode.stop(0);
 	sourceNode = null;
 	filePlayOn = false;
@@ -413,7 +395,13 @@ function onStream(stream) {
 // mic errorCallback			 
 function onStreamError(error) {
 	console.error('Error getting microphone', error);
-	micPlayOn = false;
+	micOn = false;
 }
 
+
+
+
+function stopAnimation() { 
+	clearInterval(animation_id);
+}
 
