@@ -235,10 +235,6 @@ function playDemo() {
 		turnOffMicAudio();
 	}
 
-	if (demoPlayOn) {
-		turnOffDemoAudio();
-	}
-
 	if (filePlayOn) {
 		turnOffFileAudio();
 	}
