@@ -64,7 +64,7 @@ window.onload=function(){
 
 
 	var demoReq = new XMLHttpRequest();
-	demoReq.open("Get","rensacut.mp3",true);
+	demoReq.open("Get","SlippyCut.mp3",true);
 	demoReq.responseType = "arraybuffer";
 	demoReq.onload = function(){
 		context.decodeAudioData(demoReq.response, function(buffer)
