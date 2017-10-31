@@ -259,6 +259,7 @@ function playMic()
 	if (demoPlayOn) {
 		turnOffDemoAudio();
 	}
+
 	if (micOn) {
 		turnOffMicAudio();
 	}
@@ -302,8 +303,8 @@ function playDemo() {
 
 	demoPlayOn = true;
 	
-	var demo = document.getElementById("demoAudioInput");
-	demo.innerHTML = 'Sample Audio Stop'
+	var DemoAudio = document.getElementById("demoAudioInput");
+	DemoAudio.innerHTML = 'Sample Audio Stop'
 }
 
 
