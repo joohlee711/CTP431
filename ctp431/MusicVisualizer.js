@@ -252,8 +252,8 @@ function playDemo() {
 
 	demoPlayOn = true;
 	
-	var DemoAudio = document.getElementById("demoAudioInput");
-	DemoAudio.innerHTML = 'Sample Audio Stop'
+	var Demo = document.getElementById("demoAudioInput");
+	Demo.innerHTML = 'Sample Audio Stop'
 }
 
 
