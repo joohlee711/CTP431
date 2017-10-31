@@ -2,7 +2,9 @@
 
 var context;
 var source = null;
+
 var myAudioBuffer = null;
+var myAudioBuffer_localplayer;
 
 var sourceNode = null;
 var mediaSourceNode = null;
@@ -70,7 +72,6 @@ window.onload=function(){
 		}
 
 	demoReq.send();
-
 	animation_function = drawBand;
 }
 
@@ -127,6 +128,7 @@ function fileChanged(e){
 function fileLoaded(e){
 	    context.decodeAudioData(e.target.result, function(buffer) {
 	      myAudioBuffer_localplayer = buffer;
+
 	    });
 	    console.log("File has been loaded.")
 }
@@ -164,7 +166,7 @@ function drawBand() {
 	var drawContext = vis_view.getContext('2d');
 	
 	// fill rectangular (for the entire canvas)
-	drawContext.fillStyle = 'rgb(0, 0, 0)';
+	drawContext.fillStyle = 'rgb(255, 255, 255)';
 	drawContext.fillRect(0, 0, WIDTH, HEIGHT);
 
 
@@ -177,7 +179,7 @@ function drawBand() {
 		if (sound_level < prev_band_level[i]) {
 			sound_level_env = prev_band_level[i];
 			
-			prev_band_level[i] = prev_band_level[i]*0.98;
+			prev_band_level[i] = prev_band_level[i]*0.9;
 			
 		}
 		else {
@@ -187,11 +189,11 @@ function drawBand() {
 
 		// shape
 		drawContext.beginPath();
-		var radius = SOUND_METER_WIDTH/2
+		var radius = SOUND_METER_WIDTH*2
 		var x = SOUND_METER_GAP + radius + (SOUND_METER_WIDTH+SOUND_METER_GAP)*i;
 		drawContext.arc(x, SOUND_METER_HEIGHT-sound_level_env, radius, 0, 2 * Math.PI, true);
 
-		// color_B&W
+		// color
 		var intensity = new Array(3);
 		if (SOUND_METER_HEIGHT-sound_level_env > SOUND_METER_HEIGHT*1/4) {
 			for (var j=0; j<3; j++) {
@@ -200,9 +202,9 @@ function drawBand() {
 		}
 
 		else {
-			intensity[0] = 255;
-			intensity[1] = 255;
-			intensity[2] = 255;
+			intensity[0] = 0;
+			intensity[1] = 0;
+			intensity[2] = 0;
 		}
 
 		drawContext.fillStyle='rgb(' + intensity[0] + ',' + intensity[1] + ',' + intensity[2] + ')'; 
