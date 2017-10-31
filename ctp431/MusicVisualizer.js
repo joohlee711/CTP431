@@ -258,11 +258,9 @@ function playMic()
 {
 	if (demoPlayOn) {
 		turnOffDemoAudio();
-		return;
 	}
 	if (micOn) {
 		turnOffMicAudio();
-		return;
 	}
 
 	if (!navigator.getUserMedia)
@@ -285,11 +283,10 @@ function playDemo() {
 	
 	if (filePlayOn) {
 		turnOffFileAudio();
-		return;
 	}
+
 	if (micOn) {
 		turnOffMicAudio();
-		return;
 	}
 
 	sourceNode = context.createBufferSource();
@@ -305,8 +302,8 @@ function playDemo() {
 
 	demoPlayOn = true;
 	
-	var DemoAudio = document.getElementById("DemoAudio");
-	DemoAudio.innerHTML = 'Demo Audio Stop'
+	var demo = document.getElementById("demoAudioInput");
+	demo.innerHTML = 'Sample Audio Stop'
 }
 
 
@@ -315,13 +312,13 @@ function playDemo() {
 function playFile() {
 	
 	if (demoPlayOn) {
-		turnOffFileAudio();
-		return;
+		turnOffDemoAudio();
 	}
+
 	if (micOn) {
 		turnOfMicAudio();
-		return;
 	}
+
 
 	sourceNode = context.createBufferSource();
 
@@ -357,6 +354,7 @@ function turnOffDemoAudio() {
 	stopAnimation();
 }
 
+
 function turnOffMicAudio() {
 	var MicAudio = document.getElementById("micInput");		
 	MicAudio.innerHTML = 'Mic On'
@@ -365,6 +363,7 @@ function turnOffMicAudio() {
 
 	stopAnimation();
 }
+
 
 function turnOffFileAudio() {
 	var FileAudio = document.getElementById("fileChooseInput");
