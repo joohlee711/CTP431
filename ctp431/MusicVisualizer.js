@@ -13,7 +13,7 @@ var vis_value;
 
 var WIDTH = 600;
 var HEIGHT = 380;
-var SOUND_METER_GAP = 15;
+var SOUND_METER_GAP = 10;
 var SOUND_METER_WIDTH = 40;
 var SOUND_METER_HEIGHT = HEIGHT;
 var SOUND_METER_MIN_LEVEL = -96.0;  // dB
@@ -46,20 +46,6 @@ window.onload=function(){
 	window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 
-
-
-	var visMod1 = document.getElementById("visMode1");
-	visMod1.addEventListener("click", function(){
-			setAnimationFunction(1)	
-	}, false); 
-
-	var visMod2 = document.getElementById("visMode2");
-	visMod2.addEventListener("click", function(){
-			setAnimationFunction(2)	
-	}, false); 
-
-
-
 	vis_view = document.getElementById("loudnessView");
 	vis_value = document.getElementById("loudnessValue");
 	vis_view.width =  WIDTH;
@@ -84,6 +70,7 @@ window.onload=function(){
 		}
 
 	demoReq.send();
+
 	animation_function = drawBand;
 }
 
@@ -119,26 +106,7 @@ function stopSound(anybuffer) {
 
 
 
-function setAnimationFunction (mode_num) {
-	if (mode_num == 1) {
-		animation_function = drawBand;
-	}
-	else if(mode_num == 2) {
-		animation_function = drawWaterfall;		
-	}
-
-	if (demoPlayOn || micOn) {
-		stopAnimation();
-
-		// restart visualize audio animation
-		animation_id = setInterval(animation_function, context.sampleRate/analyser.fftSize);
-	}
-}
-
-
-
 function drawBand() {
-
 	// get samples 
 	var data_array = new Float32Array(analyser.frequencyBinCount);
 	analyser.getFloatFrequencyData(data_array);
@@ -154,7 +122,7 @@ function drawBand() {
 	var drawContext = vis_view.getContext('2d');
 	
 	// fill rectangular (for the entire canvas)
-	drawContext.fillStyle = 'rgb(255, 222, 208)';
+	drawContext.fillStyle = 'rgb(0, 0, 0)';
 	drawContext.fillRect(0, 0, WIDTH, HEIGHT);
 
 
@@ -163,30 +131,39 @@ function drawBand() {
 		// fill rectangular (for the sound level)
 		var sound_level = (octaveband_level_db[i]-SOUND_METER_MIN_LEVEL)/(0.0-SOUND_METER_MIN_LEVEL)*SOUND_METER_HEIGHT;
 		var sound_level_env;
-		
-		///// asymmetric envelope detector
+
 		if (sound_level < prev_band_level[i]) {
 			sound_level_env = prev_band_level[i];
-
-			prev_band_level[i] = prev_band_level[i]*0.95;
-		} 
+			
+			prev_band_level[i] = prev_band_level[i]*0.98;
+			
+		}
 		else {
 			sound_level_env = sound_level;
-
 			prev_band_level[i] = sound_level;
 		}
-		
+
 		// shape
 		drawContext.beginPath();
-		var x = SOUND_METER_GAP + (SOUND_METER_WIDTH+SOUND_METER_GAP)*i;
-		drawContext.rect(x, SOUND_METER_HEIGHT, SOUND_METER_WIDTH, -sound_level_env);
+		var radius = SOUND_METER_WIDTH/2
+		var x = SOUND_METER_GAP + radius + (SOUND_METER_WIDTH+SOUND_METER_GAP)*i;
+		drawContext.arc(x, SOUND_METER_HEIGHT-sound_level_env, radius, 0, 2 * Math.PI, true);
 
-		// color
-		var hue = Math.floor(255/9*i);
-		var saturation = 255;
-		var value = 255;
-		var rgb = hsvToRgb(hue, saturation, value);
-		drawContext.fillStyle='rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'; 
+		// color_B&W
+		var intensity = new Array(3);
+		if (SOUND_METER_HEIGHT-sound_level_env > SOUND_METER_HEIGHT*1/4) {
+			for (var j=0; j<3; j++) {
+				intensity[j] = Math.floor(Math.pow(sound_level_env,1.5)/Math.pow(SOUND_METER_HEIGHT,1.5)*255);
+			}
+		}
+
+		else {
+			intensity[0] = 255;
+			intensity[1] = 255;
+			intensity[2] = 255;
+		}
+
+		drawContext.fillStyle='rgb(' + intensity[0] + ',' + intensity[1] + ',' + intensity[2] + ')'; 
 		drawContext.fill();
 	}
 
@@ -194,23 +171,16 @@ function drawBand() {
 
 
 
-function drawWaterfall() {
-
-	
-}
-
-
 function playMic()
 {
 
 	if (micOn) {
 		turnOffMicAudio();
+		return;
 	}
-
 	if (demoPlayOn) {
 		turnOffDemoAudio();
 	}
-
 	if (filePlayOn) {
 		turnOffFileAudio();
 	}
@@ -225,6 +195,10 @@ function playMic()
 	// get audio input streaming 				 
 	navigator.getUserMedia({audio: true}, onStream, onStreamError)
 
+	micOn = true;
+
+	var mic = document.getElementById("micInput");
+	mic.innerHTML = 'Mic Off'
 
 }
 
@@ -234,7 +208,10 @@ function playDemo() {
 	if (micOn) {
 		turnOffMicAudio();
 	}
-
+	if (demoPlayOn) {
+		turnOffDemoAudio();
+		return;
+	}
 	if (filePlayOn) {
 		turnOffFileAudio();
 	}
@@ -261,12 +238,15 @@ function playDemo() {
 
 function playFile() {
 	
+	if (micOn) {
+		turnOffMicAudio();
+	}
 	if (demoPlayOn) {
 		turnOffDemoAudio();
 	}
-
-	if (micOn) {
-		turnOfMicAudio();
+	if (filePlayOn) {
+		turnOffFileAudio();
+		return;
 	}
 
 
@@ -291,7 +271,14 @@ function playFile() {
 
 
 
+function turnOffMicAudio() {
+	var MicAudio = document.getElementById("micInput");		
+	MicAudio.innerHTML = 'Mic On'
+	mediaSourceNode = null;
+	micOn = false;
 
+	stopAnimation();
+}
 
 
 function turnOffDemoAudio() {
@@ -304,15 +291,6 @@ function turnOffDemoAudio() {
 	stopAnimation();
 }
 
-
-function turnOffMicAudio() {
-	var MicAudio = document.getElementById("micInput");		
-	MicAudio.innerHTML = 'Mic On'
-	mediaSourceNode = null;
-	micOn = false;
-
-	stopAnimation();
-}
 
 
 function turnOffFileAudio() {
