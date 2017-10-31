@@ -189,7 +189,7 @@ function drawBand() {
 
 		// shape
 		drawContext.beginPath();
-		var radius = SOUND_METER_WIDTH*2
+		var radius = SOUND_METER_WIDTH
 		var x = SOUND_METER_GAP + radius + (SOUND_METER_WIDTH+SOUND_METER_GAP)*i;
 		drawContext.arc(x, SOUND_METER_HEIGHT-sound_level_env, radius, 0, 2 * Math.PI, true);
 
@@ -203,8 +203,8 @@ function drawBand() {
 
 		else {
 			intensity[0] = 0;
-			intensity[1] = 0;
-			intensity[2] = 0;
+			intensity[1] = 100;
+			intensity[2] = 255;
 		}
 
 		drawContext.fillStyle='rgb(' + intensity[0] + ',' + intensity[1] + ',' + intensity[2] + ')'; 
