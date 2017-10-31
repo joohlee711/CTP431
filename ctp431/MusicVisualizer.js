@@ -84,7 +84,7 @@ window.onload=function(){
 		}
 
 	demoReq.send();
-	animation_function = draw_octaveband;
+	animation_function = drawBand;
 }
 
 
@@ -121,10 +121,10 @@ function stopSound(anybuffer) {
 
 function setAnimationFunction (mode_num) {
 	if (mode_num == 1) {
-		animation_function = draw_octaveband;
+		animation_function = drawBand;
 	}
 	else if(mode_num == 2) {
-		animation_function = draw_MyOwn;		
+		animation_function = drawWaterfall;		
 	}
 
 	if (demoPlayOn || micOn) {
@@ -137,7 +137,7 @@ function setAnimationFunction (mode_num) {
 
 
 
-function draw_octaveband() {
+function drawBand() {
 
 	// get samples 
 	var data_array = new Float32Array(analyser.frequencyBinCount);
@@ -194,80 +194,27 @@ function draw_octaveband() {
 
 
 
-function draw_MyOwn() {
-	// get samples 
-	var data_array = new Float32Array(analyser.frequencyBinCount);
-	analyser.getFloatFrequencyData(data_array);
+function drawWaterfall() {
 
-	var octaveband_level_db = calc_octaveband(data_array)
-
-	// display the loudness value (this is for verifying if the level is correctly computed.)
-	var loudness = octaveband_level_db[0];
-	vis_value.innerHTML = '32Hz-Band Level (dB): ' + loudness + ' dB'
-
-	// 2d canvas context
-	var drawContext = vis_view.getContext('2d');
-
-	// fill rectangular (for the entire canvas)
-	drawContext.fillStyle = 'rgb(255, 222, 208)';
-	drawContext.fillRect(0, 0, WIDTH, HEIGHT);
-
-
-	for (var i=0; i<10; i++) {
-
-		// fill rectangular (for the sound level)
-		var sound_level = (octaveband_level_db[i]-SOUND_METER_MIN_LEVEL)/(0.0-SOUND_METER_MIN_LEVEL)*20;
-		var sound_level_env;
-		
-		///// asymmetric envelope detector
-		if (sound_level < prev_band_level[i]) {
-			sound_level_env = prev_band_level[i];
-
-			prev_band_level[i] = prev_band_level[i]*0.95;
-		} 
-		else {
-			sound_level_env = sound_level;
-
-			prev_band_level[i] = sound_level;
-		}
-
-		//shape
-		drawContext.beginPath();
-		var r = 30 + (10-i)*sound_level_env;
-		drawContext.arc(WIDTH/2, HEIGHT/2, r, 0, 2*Math.PI, true);
-
-		//color
-		var hue = Math.floor(255/9*i);
-		var saturation = 255;
-		var value = 255;
-		var rgb = hsvToRgb(hue, saturation, value);
-		drawContext.fillStyle='rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'; 
-		drawContext.fill();
-	}
 	
-	drawContext.beginPath();
-	drawContext.arc(WIDTH/2, HEIGHT/2, 30, 0, 2*Math.PI, true);
-	drawContext.fillStyle='rgb(255, 222, 208)';
-	drawContext.fill();
-	
-	var image = new Image();
-	image.src = 'musicalnote2.png';
-	image.addEventListener('load', eventimageLoaded, false);
-	function eventimageLoaded(){
-		drawContext.drawImage(image, (WIDTH/2)-40, (HEIGHT/2)-40);
-	}
 }
 
 
 function playMic()
 {
-	if (demoPlayOn) {
-		turnOffDemoAudio();
-	}
 
 	if (micOn) {
 		turnOffMicAudio();
 	}
+
+	if (demoPlayOn) {
+		turnOffDemoAudio();
+	}
+
+	if (filePlayOn) {
+		turnOffFileAudio();
+	}
+
 
 	if (!navigator.getUserMedia)
 		navigator.getUserMedia = (navigator.getUserMedia({audio: true}) || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
@@ -278,21 +225,22 @@ function playMic()
 	// get audio input streaming 				 
 	navigator.getUserMedia({audio: true}, onStream, onStreamError)
 
-	micOn = true;
 
-	var mic = document.getElementById("micInput");
-	mic.innerHTML = 'Mic Off'
 }
 
 
 function playDemo() {
 	
-	if (filePlayOn) {
-		turnOffFileAudio();
-	}
-
 	if (micOn) {
 		turnOffMicAudio();
+	}
+
+	if (demoPlayOn) {
+		turnOffDemoAudio();
+	}
+
+	if (filePlayOn) {
+		turnOffFileAudio();
 	}
 
 	sourceNode = context.createBufferSource();
