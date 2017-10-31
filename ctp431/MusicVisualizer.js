@@ -45,6 +45,9 @@ window.onload=function(){
 	FileAudio.addEventListener("change", fileChanged, false);
 	window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
+
+
+
 	var visMod1 = document.getElementById("visMode1");
 	visMod1.addEventListener("click", function(){
 			setAnimationFunction(1)	
@@ -54,6 +57,8 @@ window.onload=function(){
 	visMod2.addEventListener("click", function(){
 			setAnimationFunction(2)	
 	}, false); 
+
+
 
 	vis_view = document.getElementById("loudnessView");
 	vis_value = document.getElementById("loudnessValue");
