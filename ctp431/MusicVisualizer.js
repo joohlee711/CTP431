@@ -127,7 +127,7 @@ function fileChanged(e){
 	
 function fileLoaded(e){
 	    context.decodeAudioData(e.target.result, function(buffer) {
-	      myAudioBuffer_localplayer = buffer;
+	      myAudioBuffer = buffer;
 
 	    });
 	    console.log("File has been loaded.")
