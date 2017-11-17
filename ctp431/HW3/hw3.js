@@ -4,26 +4,26 @@ var synth;
 var synth_params = {
 	lfoRate: 65,
 	lfoDepth: 25,
-	filterCutoffFreq:5978,
+	filterCutoffFreq:5098,
 	filterQ:1,
-	filterEnvAttackTime: 0.58,
-	filterEnvDecayTime: 0.58,
-	filterEnvSustainLevel: 073,
-	filterEnvReleaseTime: 1.38,
-	ampEnvAttackTime: 0.15,
+	filterEnvAttackTime: 0.68,
+	filterEnvDecayTime: 1.95,
+	filterEnvSustainLevel: 0.37,
+	filterEnvReleaseTime: 1.25,
+	ampEnvAttackTime: 0.71,
 	ampEnvDecayTime: 0.21,
-	ampEnvSustainLevel: 0.9,
+	ampEnvSustainLevel: 0.42,
 	ampEnvReleaseTime: 1.05
 };
 
 
 var delay_params = {
-	delayTime: 0.2,
-	delayFeedbackGain: 0.19,
-	delayWetDry: 0.78
+	delayTime: 0.14,
+	delayFeedbackGain: 0.48,
+	delayWetDry: 0.51
 }
 var reverb_params = {
-	reverbWetDry: 0.54
+	reverbWetDry: 0.48
 };
 
 // default
