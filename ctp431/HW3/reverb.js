@@ -8,7 +8,7 @@ var Reverb = function(context, parameters) {
 	this.drygain = context.createGain();
 	this.wetgain = context.createGain();
 
-	this.impulseResponse = null;
+	
 
 	//connect
 
@@ -27,11 +27,11 @@ var Reverb = function(context, parameters) {
 }
 
 function loadImpulseResponse(reverb) {
-	var request = new XMLHttpRequest();
-	var url = "18a_smoking_room.wav";
-	request.open('GET', url, true);
-	request.responseType = 'arraybuffer';
-	request.onload = function() {
+		var request = new XMLHttpRequest();
+		var url = "18a_smoking_room.wav";
+	  	request.open('GET', url, true);
+	  	request.responseType = 'arraybuffer';
+	  	request.onload = function() {
 	    context.decodeAudioData(request.response, function(buffer) {
 			reverb.convolver.buffer = buffer;
 	    });

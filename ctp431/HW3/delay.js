@@ -17,9 +17,6 @@ var Delay = function(context, parameters) {
 
 	this.input.connect(this.dryGain);
 
-	this.dryGain.connect(this.context.destination);
-	this.wetGain.connect(this.context.destination);
-
 	this.delayLine.delayTime.value = parameters.delayTime;
 	this.feedbackGain.gain.value = parameters.delayFeedbackGain;
 
@@ -28,7 +25,7 @@ var Delay = function(context, parameters) {
 
 	this.parameters = parameters;
 }
-
+// reverb부분은 rawgit code를 적극참조.
 
 Delay.prototype.updateParams = function (params, value) {
 
@@ -48,3 +45,9 @@ Delay.prototype.updateParams = function (params, value) {
 			break;		
 	}
 }
+
+Delay.prototype.connect = function(node) {
+	this.wetGain.connect(node.input);
+	this.dryGain.connect(node.input);
+}
+

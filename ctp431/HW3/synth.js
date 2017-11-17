@@ -1,22 +1,24 @@
 var Voice = function(context, frequency, amplitude, parameters, effect_node) {
 	this.context = context;
 
-	// oscillator
+	//LFO
 
 	this.modulatingOsc = context.createOscillator();
 	this.modulatingOscGain = context.createGain();
 
 	this.modulatingOsc.frequency.value = frequency * 0.005 * parameters.lfoRate;
 	this.modulatingOscGain.gain.value = 10 * parameters.lfoDepth;
+	
 
+	// oscillator
 	this.osc = context.createOscillator()
 	this.osc.onended = function () {
 		this.voiceState = 0;	
 	};
 
+	this.modulatingOsc.connect(this.modulatingOscGain);
+	this.modulatingOscGain.connect(this.osc.frequency);
 
-	this.LFOosc = context.createOscillator();
-	this.LFOosc_gain = context.createGain();
 
 	// filter 
 	this.filter = context.createBiquadFilter();
@@ -25,26 +27,15 @@ var Voice = function(context, frequency, amplitude, parameters, effect_node) {
 	this.ampEnv = context.createGain();
 
 	// connect
-	this.LFOosc.connect(this.LFOosc_gain);
-	this.LFOosc_gain.connect(this.osc.frequency);
 	this.osc.connect(this.filter);
 	this.filter.connect(this.ampEnv);
-
-	//this.ampEnv.connect(context.destination);
-	//this.output = this.ampEnv;
 	this.ampEnv.connect(effect_node);
 
-	// preset parameters 
+	// pre-setting parameters 
 	this.osc.frequency.value = frequency;
-	this.LFOosc.frequency.value = parameters.lfoRate;
-	this.LFOosc_gain.gain.value = parameters.lfoDepth;
-
 	this.filterCutoffFreq = parameters.filterCutoffFreq;
 	this.filterQ = parameters.filterQ;
-	this.filterEnvAttackTime = parameters.filterEnvAttackTime;
-	this.filterEnvDecayTime = parameters.filterEnvDecayTime;
-	this.filterEnvSustainLevel = parameters.filterEnvSustainLevel;
-	this.filterEnvReleaseTime = parameters.filterEnvReleaseTime;
+
 
 	this.ampEnvLevel = amplitude;
 	this.ampEnvAttackTime = parameters.ampEnvAttackTime;
@@ -52,9 +43,14 @@ var Voice = function(context, frequency, amplitude, parameters, effect_node) {
 	this.ampEnvSustainLevel = parameters.ampEnvSustainLevel;
 	this.ampEnvReleaseTime = parameters.ampEnvReleaseTime;
 
+	this.filterEnvAttackTime = parameters.filterEnvAttackTime;
+	this.filterEnvDecayTime = parameters.filterEnvDecayTime;
+	this.filterEnvSustainLevel = parameters.filterEnvSustainLevel;
+	this.filterEnvReleaseTime = parameters.filterEnvReleaseTime;
 
 	
-	this.LFOosc.type = 'sine';
+
+	this.modulatingOsc.type = 'sine';
 	this.osc.type = 'square';
 	this.filter.type = 'lowpass';
 	this.filter.frequency.value = 5000;
@@ -64,13 +60,12 @@ var Voice = function(context, frequency, amplitude, parameters, effect_node) {
 	this.voiceState = 0;	
 };
 
-
-
 Voice.prototype.on = function() {
-	this.LFOOsc.start()
+	this.modulatingOsc.start();
 	this.osc.start();
 	this.triggerAmpEnvelope();
 	this.triggerFilterEnvelope();
+
 	this.voiceState = 1;
 };
 
@@ -89,7 +84,6 @@ Voice.prototype.triggerAmpEnvelope = function() {
 	param.linearRampToValueAtTime(this.ampEnvLevel * this.ampEnvSustainLevel, now + this.ampEnvAttackTime + this.ampEnvDecayTime);
 };
 
-
 Voice.prototype.triggerFilterEnvelope = function() {
 	var param = this.filter.frequency;
 	var now = this.context.currentTime;
@@ -104,8 +98,6 @@ Voice.prototype.triggerFilterEnvelope = function() {
 	param.linearRampToValueAtTime(this.filterCutoffFreq * this.filterEnvSustainLevel, now + this.filterEnvAttackTime + this.filterEnvDecayTime);
 };
 
-
-
 Voice.prototype.off = function() {
 	var ampparam = this.ampEnv.gain;
 	var filterparam = this.filter.frequency;
@@ -119,9 +111,9 @@ Voice.prototype.off = function() {
 	filterparam.setValueAtTime(filterparam.value, now);
 	filterparam.exponentialRampToValueAtTime(0.001, now + this.filterEnvReleaseTime);
 
+
 	this.osc.stop(now + this.ampEnvReleaseTime);
 };
-
 
 
 var Synth = function(context, parameters) {
@@ -177,6 +169,7 @@ Synth.prototype.updateParams = function(params, value) {
 			break;
 		case 'lfo_depth':
 			this.parameters.lfoDepth = value;
+			break;
 		case 'filter_freq': 
 			this.parameters.filterCutoffFreq = value;
 			break;
@@ -191,7 +184,7 @@ Synth.prototype.updateParams = function(params, value) {
 			break;		
 		case 'filter_release_time':
 			this.parameters.filterEnvReleaseTime = value;
-			break;			
+			break;	
 		case 'amp_attack_time': 
 			this.parameters.ampEnvAttackTime = value;
 			break;		
@@ -210,3 +203,4 @@ Synth.prototype.updateParams = function(params, value) {
 Synth.prototype.connect = function(node) {
 	this.fx_input = node.input;
 }
+

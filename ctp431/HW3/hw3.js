@@ -2,27 +2,28 @@ var context = new AudioContext()
 var synth;
 
 var synth_params = {
-	lfoRate:50,
+	lfoRate: 50,
 	lfoDepth: 80,
-	filterCutoffFreq:2897,
+	filterCutoffFreq:2753,
 	filterQ:1,
-	filterEnvAttackTime: 0.39,
-	filterEnvDecayTime: 0.47,
+	filterEnvAttackTime: 0.34,
+	filterEnvDecayTime: 0.58,
 	filterEnvSustainLevel: 0.9,
-	filterEnvReleaseTime: 0.65,
+	filterEnvReleaseTime: 0.75,
 	ampEnvAttackTime: 0.4,
-	ampEnvDecayTime: 1.2,
-	ampEnvSustainLevel: 1.0,
-	ampEnvReleaseTime: 0.3
+	ampEnvDecayTime: 1.0,
+	ampEnvSustainLevel: 0.9,
+	ampEnvReleaseTime: 0.2
 };
 
+
 var delay_params = {
-	delayTime: 0.2,
+	delayTime: 0.3,
 	delayFeedbackGain: 0.2,
 	delayWetDry: 0.25
 }
 var reverb_params = {
-	reverbWetDry: 0.8
+	reverbWetDry: 0.7
 };
 
 // default
@@ -46,20 +47,20 @@ nx.onload = function() {
 
 	// OSC
 	// LFO
+
 	gui_lfo_rate.min = 0;
 	gui_lfo_rate.max = 100;
 	gui_lfo_rate.set({value: synth_params.lfoRate})
 	gui_lfo_rate.on('*', function(data) {
-		synth.updateParams('lfo_rate', data.value)
-	});
+		synth.updateParams('lfo_rate', data.value);
+	})
 
 	gui_lfo_depth.min = 0;
 	gui_lfo_depth.max = 100;
 	gui_lfo_depth.set({value: synth_params.lfoDepth})
 	gui_lfo_depth.on('*', function(data) {
-		synth.updateParams('lfo_depth', data.value)
-	});
-
+		synth.updateParams('lfo_depth', data.value);
+	})
 
 	// Filter
 	gui_filter_freq.min = 100;	
@@ -68,35 +69,30 @@ nx.onload = function() {
 	gui_filter_freq.on('*',function(data) {
 		synth.updateParams('filter_freq', data.value);
 	});
-
 	gui_filter_env_attack.min = 0;
 	gui_filter_env_attack.max = 3;
 	gui_filter_env_attack.set({ value: synth_params.filterEnvAttackTime })
 	gui_filter_env_attack.on('*',function(data) {
 		synth.updateParams('filter_attack_time', data.value);
 	});
-
 	gui_filter_env_decay.min = 0;
 	gui_filter_env_decay.max = 3;
 	gui_filter_env_decay.set({ value: synth_params.filterEnvDecayTime })
 	gui_filter_env_decay.on('*',function(data) {
 		synth.updateParams('filter_decay_time', data.value);
 	});
-
 	gui_filter_env_sustain.min = 0;
 	gui_filter_env_sustain.max = 1;
 	gui_filter_env_sustain.set({ value: synth_params.filterEnvSustainLevel })
 	gui_filter_env_sustain.on('*',function(data) {
 		synth.updateParams('filter_sustain_level', data.value);
 	});
-
 	gui_filter_env_release.min = 0;
 	gui_filter_env_release.max = 3;
 	gui_filter_env_release.set({ value: synth_params.filterEnvReleaseTime })
 	gui_filter_env_release.on('*',function(data) {
 		synth.updateParams('filter_release_time', data.value);
 	});
-
 
 
 	// Amp ENV
@@ -125,8 +121,6 @@ nx.onload = function() {
 		synth.updateParams('amp_release_time', data.value);
 	});
 
-
-
 	// delay
 	gui_delay_time.min = 0;
 	gui_delay_time.max = 1;
@@ -134,21 +128,18 @@ nx.onload = function() {
 	gui_delay_time.on('*',function(data) {
 		delay.updateParams('delay_time', data.value);
 	});
-
 	gui_delay_gain.min = 0;
 	gui_delay_gain.max = 0.9;
 	gui_delay_gain.set({ value: delay_params.delayFeedbackGain })
 	gui_delay_gain.on('*',function(data) {
 		delay.updateParams('delay_feedback_gain', data.value);
 	});
-
 	gui_delay_wet_dry.min = 0;
 	gui_delay_wet_dry.max = 1;
 	gui_delay_wet_dry.set({ value: delay_params.delayWetDry })
 	gui_delay_wet_dry.on('*',function(data) {
 		delay.updateParams('delay_dry_wet', data.value);
 	});
-
 
 	//reverb
 	gui_reverb_wet_dry.min = 0;
@@ -160,8 +151,6 @@ nx.onload = function() {
 
 	//ir input
 	loadImpulseResponse(reverb);
-
-
 
 	// Keyboard 	
 	gui_keyboard.octaves = 3;
@@ -177,6 +166,7 @@ nx.onload = function() {
 		}
 
 	});
+
 
 }
 
@@ -214,4 +204,4 @@ function MIDIMessageEventHandler(event) {
 			synth.noteOff(event.data[1], event.data[2]);
 			return;
 	}
-}	
+}
