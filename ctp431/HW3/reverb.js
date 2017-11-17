@@ -28,7 +28,7 @@ var Reverb = function(context, parameters) {
 
 function loadImpulseResponse(reverb) {
 		var request = new XMLHttpRequest();
-		var url = "reverb.wav";
+		var url = "reverbfile.wav";
 	  	request.open('GET', url, true);
 	  	request.responseType = 'arraybuffer';
 	  	request.onload = function() {
