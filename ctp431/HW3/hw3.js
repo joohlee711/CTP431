@@ -2,28 +2,28 @@ var context = new AudioContext()
 var synth;
 
 var synth_params = {
-	lfoRate: 50,
-	lfoDepth: 80,
-	filterCutoffFreq:2753,
+	lfoRate: 65,
+	lfoDepth: 25,
+	filterCutoffFreq:5978,
 	filterQ:1,
-	filterEnvAttackTime: 0.34,
+	filterEnvAttackTime: 0.58,
 	filterEnvDecayTime: 0.58,
-	filterEnvSustainLevel: 0.9,
-	filterEnvReleaseTime: 0.75,
-	ampEnvAttackTime: 0.4,
-	ampEnvDecayTime: 1.0,
+	filterEnvSustainLevel: 073,
+	filterEnvReleaseTime: 1.38,
+	ampEnvAttackTime: 0.15,
+	ampEnvDecayTime: 0.21,
 	ampEnvSustainLevel: 0.9,
-	ampEnvReleaseTime: 0.2
+	ampEnvReleaseTime: 1.05
 };
 
 
 var delay_params = {
-	delayTime: 0.3,
-	delayFeedbackGain: 0.2,
-	delayWetDry: 0.25
+	delayTime: 0.2,
+	delayFeedbackGain: 0.19,
+	delayWetDry: 0.78
 }
 var reverb_params = {
-	reverbWetDry: 0.7
+	reverbWetDry: 0.54
 };
 
 // default

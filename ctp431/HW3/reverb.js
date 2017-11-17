@@ -28,7 +28,7 @@ var Reverb = function(context, parameters) {
 
 function loadImpulseResponse(reverb) {
 		var request = new XMLHttpRequest();
-		var url = "18a_smoking_room.wav";
+		var url = "circularoutput_sing.mp3";
 	  	request.open('GET', url, true);
 	  	request.responseType = 'arraybuffer';
 	  	request.onload = function() {
