@@ -1,0 +1,133 @@
+<html>
+
+<head>
+    <title> 20130489 JooHee Lee </title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1., user-scalable=no, width=device-width"/>
+    <link rel='stylesheet' href='./visCss.css'>
+
+    <!-- foundation framework links -->
+    <script src="./js/analytics.js"></script>
+    <script src="./site/foundation/js/vendor/custom.modernizr.js"></script>
+
+    <!-- jquery links -->
+    <script src="./js/jquery.js"></script>
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/Tone9.js"></script>
+    <script src="./js/Tone.js"></script>
+
+    <!-- nexus links -->
+    <script src="./dist/NexusUI.js"></script>
+    <script src="./prism/prism.js"></script>
+
+    <script src="./techno.js"></script>
+</head>
+
+<body style="margin:0;padding;0">
+    <div class="title" align="left" style="margin: 20px 20px 0px 30px;">
+        <font size="6" font color="#f2f3f4"> Music and Audio Computing</font><br>
+        <font size="4" font color="#98bde2"> Final Project - Techno Game of Life- </font><br>
+        <div style="font-size:10pt;color:#666;font-family:gill sans;margin:5px auto 0px;text-align:right;">Made with the element of <a href="http://nexusosc.com" style="color:#09b">NexusUI</a></div>
+        <div style="font-size:10pt;color:#666;font-family:gill sans;margin:5px auto 0px;text-align:right;">Inspired by <a href="https://rlatjdrn9401.github.io/Techno%20Machine.html" style="color:#09b">Previous year's example</a> and <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life" style="color:#09b">Conway's Game of Life</a></div>
+    </div><br>
+
+
+    <div class="part1" align="center">
+
+        <div id="buttonlabel" align="center" display: inline-block;>
+            <font color="white">
+                <div id="startlabel">Start</div>
+                <div id="nextlabel">&nbsp;/&nbsp;Next Step&nbsp;/&nbsp;</div>
+                <div id="stoplabel">Stop</div>
+            </div><br>
+
+            <div id="buttonrack" align="center" display: inline-block;>
+                <canvas nx="button" id="gui_start" height="50" width="50"></canvas>&nbsp;
+                <canvas nx="button" id="gui_next" height="50" width="50"></canvas>&nbsp;
+                <canvas nx="button" id="gui_stop" height="50" width="50"></canvas>
+            </div>
+        </div><br>
+
+
+        <div class="part2" align="center">
+
+            <div id="sequencerrack" align="center">
+                <canvas nx="matrix" id="gui_sequencer" height="500" width="1000"></canvas>
+            </div>
+        </div>
+
+
+
+        
+     <div class="part3" align="center" style="margin: 40px 0px 0px 0px;">
+            <canvas nx="number" id="gui_bpm" height="40" width="60"></canvas>
+            BPM Control (Drag Up & Down)
+        </div>
+   
+
+      
+
+
+
+
+
+
+
+
+</body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        <!-- Nevermind -->
+                        <script>
+                            Nexus.context = Tone.context;
+                            var rack2 = new Nexus.Rack("buttonrack")
+                            var rack3 = new Nexus.Rack("sequencerrack")
+
+                            rack3.sequencer_1.matrix.set.all([
+                                [0,0,0,0,0,0,0,0,0,0],
+                                [0,0,0,0,0,0,0,0,0,0],
+                                [0,0,0,1,0,0,0,0,1,0],
+                                [0,0,1,0,1,0,0,1,0,1],
+                                [1,0,0,0,0,1,0,0,0,0],
+
+                                ])
+                            rack3.sequencer_1.start();
+
+                        </script> 
+
+                        </html>
